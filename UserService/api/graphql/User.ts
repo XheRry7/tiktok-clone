@@ -3,48 +3,35 @@ import {
   extendType,
   nonNull,
   intArg,
-  list,
-  arg,
   stringArg,
   booleanArg,
 } from "nexus";
-import { isBooleanObject } from "util/types";
 
 export const User = objectType({
   name: "User",
   definition(t) {
-    t.nonNull.int("id");
-    t.nonNull.string("name");
-    t.nonNull.string("email");
-    t.nonNull.string("website");
+    t.int("id");
+    t.nullable.string("name");
+    t.string("email");
     t.nullable.string("phoneNumber");
-    t.nonNull.boolean("onlineStatus");
-    t.nonNull.int("birthDay");
-    t.nullable.string("password");
-    // t.nonNull.list.nonNull.field("profile", {
-    //   type: "Profile",
-    //   resolve: (parent, _, ctx) => {
-    //     return ctx.db.profile
-    //       .findUnique({
-    //         where: { id: parent.id },
-    //       }).user()
-    //   },
-    // });
+    t.boolean("onlineStatus");
+    t.string("birthDay");
+    t.string("password");
   },
 });
 
 export const UserQuery = extendType({
   type: "Query",
   definition(t) {
-    // get all companies
-    t.list.field("users", {
+    // get all users
+    t.nonNull.list.field("getAllUsers", {
       type: "User",
-      resolve(_root, _args, ctx) {
-        return ctx.db.user.findMany();
+      resolve: async (_root, _args, ctx) => {
+        return await ctx.db.user.findMany();
       },
     });
-    // get company by id
-    t.field("user", {
+    // get user by id
+    t.field("getUserById", {
       type: "User",
       args: {
         id: nonNull(intArg()),
@@ -58,30 +45,29 @@ export const UserQuery = extendType({
   },
 });
 
-export const CompanyMutation = extendType({
+export const UserMutation = extendType({
   type: "Mutation",
   definition(t) {
-    // create a new company
+    // create a new User
     t.nonNull.field("createUser", {
       type: "User",
       args: {
-        id: intArg(),
         name: nonNull(stringArg()),
-        // birthDay: nonNull(stringArg()),
-        bio: nonNull(stringArg()),
+        birthDay: nonNull(stringArg()),
         email: nonNull(stringArg()),
         password: nonNull(stringArg()),
         phoneNumber: nonNull(stringArg()),
         onlineStatus: nonNull(booleanArg()),
       },
-      resolve(_root, args, ctx) {
-        return ctx.db.user.create({
+      resolve: async (_root, args, ctx) => {
+        return await ctx.db.user.create({
           data: {
             name: args.name,
             birthDay: args.birthDay,
             email: args.email,
             onlineStatus: args.onlineStatus,
             password: args.password,
+            phoneNumber:args.phoneNumber
           },
         });
       },

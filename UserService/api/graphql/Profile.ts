@@ -9,12 +9,6 @@ export const Profile = objectType({
     t.int("liked");
   },
 });
-//   posts  Json?
-//   user   User    @relation(fields: [userId], references: [id])
-//   userId Int     @unique
-//   followers Json[]
-//   following Json[]
-//   ProfilePicture  Json[]
 
 export const profileQuery = extendType({
   type: "Query",
